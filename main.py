@@ -1,5 +1,7 @@
 import base64 # v2
 import logging
+import aiohttp_jinja2 # v3
+import jinja2 # v3
 from aiohttp import web
 
 from cryptography import fernet # v2
@@ -17,6 +19,8 @@ def main():
     fernet_key = fernet.Fernet.generate_key() # v2
     secret_key = base64.urlsafe_b64decode(fernet_key) # v2
     setup(app, EncryptedCookieStorage(secret_key)) # v2
+
+    aiohttp_jinja2.setup(app, loader=jinja2.PackageLoader(package_name="main", package_path="templates"))
 
     setup_routes(app)
     app['config'] = BaseConfig
