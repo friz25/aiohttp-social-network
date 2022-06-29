@@ -5,6 +5,8 @@ from datetime import datetime
 from aiohttp import web
 from aiohttp_session import get_session
 
+from models.user import User # v4
+
 class Index(web.View):
     """ Главная страница """
 
@@ -25,9 +27,12 @@ class Login(web.View):
         session['last_visit'] = str(datetime.utcnow())
         last_visit = session['last_visit']
 
+        """ v4 """
+        db = self.app['db']
+        user = await User.get_user(db=db)
+        document = await db.test.find_one()
 
-        text = f'Last visited: {last_visit}'
-        return dict(text=f'login Aiohttp!, {text}')
+        return dict(last_visit=f'login Aiohttp!, Last visited: {last_visit}')
 
     async def post(self):
         """ [POST] Страница Вход в аккаунт """
@@ -39,11 +44,11 @@ class Login(web.View):
         session['user'] = {'login': login}
 
         location = self.app.router['index'].url_for()
-        return web.HTTPFound(location)
+        return web.HTTPFound(location=location)
 
 class Signup(web.View):
     """ Страница Регистрация """
     async def get(self):
         """ [GET] Страница Регистрация """
 
-        return web.Response(text = 'signup Aiohttp!')
+        return web.Response(text='signup Aiohttp!')
